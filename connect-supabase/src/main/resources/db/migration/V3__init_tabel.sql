@@ -1,4 +1,4 @@
-create table users_test
+create table users_test_2
 (
     id         bigserial primary key,
     username   varchar(100) not null,
