@@ -20,7 +20,7 @@ export default function Login() {
                 paddingTop: 80,
             }}
         >
-            <form onSubmit={onSubmit} style={{ width: 520 }}>
+            <form onSubmit={onSubmit} className="loggin-form">
                 <h4 style={{ textAlign: "center", marginBottom: 40 }}>Đăng Nhập</h4>
 
                 <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
@@ -43,9 +43,11 @@ export default function Login() {
                     />
                 </div>
 
-                {/* Button */}
-                <div style={{ textAlign: "center", color: "gray" }}>
-                    <Button type="submit" style={{ width: 180, color: "black" }} variant="primary">
+                <div style={{ textAlign: "center" }}>
+                    <Button
+                        type="submit"
+                        className="login-btn"
+                    >
                         Đăng Nhập
                     </Button>
                 </div>
