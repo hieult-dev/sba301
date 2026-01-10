@@ -1,13 +1,11 @@
 import { Form, Button } from "react-bootstrap";
 import "../assets/Login.css";
+import { useNavigate } from "react-router-dom";
 export default function Login() {
+    const navigate = useNavigate();
     const onSubmit = (e) => {
         e.preventDefault();
-        const form = new FormData(e.currentTarget);
-        const email = form.get("email");
-        const password = form.get("password");
-
-        console.log({ email, password });
+        navigate("/home");
     };
 
     return (
@@ -20,7 +18,7 @@ export default function Login() {
                 paddingTop: 80,
             }}
         >
-            <form onSubmit={onSubmit} className="loggin-form">
+            <form onSubmit={onSubmit} className="login-form">
                 <h4 style={{ textAlign: "center", marginBottom: 40 }}>Đăng Nhập</h4>
 
                 <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>

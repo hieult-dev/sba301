@@ -1,14 +1,15 @@
 
 import './App.css'
-import '../src/components/Login.jsx'
-import Login from '../src/components/Login.jsx'
+import Login from '../src/page/Login.jsx'
+import Home from '../src/page/Home.jsx'
+import { Routes, Route } from "react-router-dom";
 
 function App() {
-
   return (
-    <>
-      <Login />
-    </>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/home" element={<Home />} />
+    </Routes>
   )
 }
 
