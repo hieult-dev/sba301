@@ -7,14 +7,12 @@
     align-items: center;
     padding: 14px 20px;
     background: #ffffff;
-    border-bottom: 1px solid #ececec;
 }
 
 .home-logoBox {
     height: 44px;
     background: #f0f2f5;
     border-radius: 8px;
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -65,12 +63,22 @@
     flex: 1;
 }
 
+.home {
+    min-height: 100vh;
+}
+
+.home-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 /* Box content trắng ở giữa */
 .home-contentBox {
+    flex: 1;
     height: 100%;
-    min-height: 620px;
+    min-height: 600px;
     position: relative;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
 
 /* Dòng hint dưới cùng */
@@ -78,7 +86,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 12px;
+    bottom: 0px;
     text-align: center;
     font-size: 13px;
     color: #555;

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 export default function Header() {
     return (
         <>
-            {/* Header */}
             <header className="home-header">
                 <div className="home-logoBox">Logo</div>
 
@@ -17,7 +16,6 @@ export default function Header() {
                 </div>
             </header>
 
-            {/* Nav */}
             <nav className="home-nav">
                 <Link to="/home" className="home-link">
                     Trang Chủ

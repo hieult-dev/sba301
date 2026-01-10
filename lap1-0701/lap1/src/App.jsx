@@ -1,16 +1,19 @@
-
 import './App.css'
 import Login from '../src/page/Login.jsx'
-import Home from '../src/page/Home.jsx'
+import Layout from './page/Layout.jsx'
+import ManageAgent from '../src/components/ManageAgent.jsx'
 import { Routes, Route } from "react-router-dom";
-
-function App() {
+import { Navigate } from "react-router-dom";
+import HomePage from './page/Home.jsx'
+export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/home" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Navigate to="home" replace />} />
+        <Route path="home" element={<HomePage />} />
+        <Route path="agents" element={<ManageAgent />} />
+      </Route>
     </Routes>
-  )
+  );
 }
-
-export default App
