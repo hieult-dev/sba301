@@ -2,7 +2,7 @@
 
 import { Star, MapPin, Clock, Phone } from "lucide-react"
 import { Button } from "./ui/button"
-import type { Spa } from "@/common/lib/mock-data"
+import type { Spa } from "@/common/util/mock-data"
 
 interface SpaCardProps {
   spa: Spa
