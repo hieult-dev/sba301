@@ -10,7 +10,9 @@ export default function Header() {
                 <div className="home-userBox">
                     <div>
                         Chào {"<Tên đăng nhập>"}{" "}
-                        <span className="home-logout">đăng xuất</span>
+                        <Link to="/login" className="home-link">
+                            đăng xuất
+                        </Link>
                     </div>
                     <div>Ngày:</div>
                 </div>
