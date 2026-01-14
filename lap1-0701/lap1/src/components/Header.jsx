@@ -1,5 +1,16 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../security/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 export default function Header() {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    }
+
     return (
         <>
             <header className="home-header">
@@ -10,7 +21,7 @@ export default function Header() {
                 <div className="home-userBox">
                     <div>
                         Chào {"<Tên đăng nhập>"}{" "}
-                        <Link to="/login" className="home-link">
+                        <Link to="/login" onClick={handleLogout} className="home-link">
                             đăng xuất
                         </Link>
                     </div>

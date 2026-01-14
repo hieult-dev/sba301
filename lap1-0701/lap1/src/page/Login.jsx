@@ -1,10 +1,20 @@
 import { Form, Button } from "react-bootstrap";
 import "../assets/Login.css";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../security/AuthContext"; // thêm dòng này
+
 export default function Login() {
     const navigate = useNavigate();
+    const { login } = useAuth(); // lấy login từ context
+
     const onSubmit = (e) => {
         e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const userData = {
+            email: formData.get("email"),
+            role: "user",
+        };
+        login(userData); // sẽ set localStorage 'userdata'
         navigate("/home");
     };
 
