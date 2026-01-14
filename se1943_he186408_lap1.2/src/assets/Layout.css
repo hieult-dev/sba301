@@ -1,0 +1,129 @@
+/* Background full màn hình */
+
+/* Header */
+.home-header {
+    display: grid;
+    grid-template-columns: 140px 1fr 260px;
+    align-items: center;
+    padding: 14px 20px;
+    background: #ffffff;
+}
+
+.home-logoBox {
+    height: 44px;
+    background: #f0f2f5;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.home-title {
+    text-align: center;
+    font-weight: 800;
+    font-size: 18px;
+}
+
+.home-userBox {
+    justify-self: end;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.home-logout {
+    margin-left: 10px;
+    color: #0b66ff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Nav */
+.home-nav {
+    background: #ffffff;
+    padding: 10px 20px;
+    display: flex;
+    gap: 18px;
+    border-bottom: 1px solid #ececec;
+}
+
+.home-link {
+    color: #0b66ff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.home-link:hover {
+    text-decoration: underline;
+}
+
+/* Main */
+.home-main {
+    flex: 1;
+}
+
+.home {
+    min-height: 100vh;
+}
+
+.home-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Box content trắng ở giữa */
+.home-contentBox {
+    flex: 1;
+    height: 100%;
+    min-height: 600px;
+    position: relative;
+}
+
+/* Dòng hint dưới cùng */
+.home-mainHint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    text-align: center;
+    font-size: 13px;
+    color: #555;
+}
+
+/* Footer */
+.home-footer {
+    background: #ffffff;
+    border-top: 1px solid #ececec;
+    padding: 12px 20px;
+
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+}
+
+.home-footerLeft {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.home-footerCenter {
+    justify-self: center;
+    font-size: 12px;
+}
+
+.home-footerLink {
+    color: #111;
+    text-decoration: none;
+}
+
+.home-footerLink:hover {
+    text-decoration: underline;
+}
+
+.home-footerSep {
+    margin: 0 8px;
+    color: #999;
+}
