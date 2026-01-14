@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
         }
     });
 
-    const [loading, setLoading] = useState(false);
+    const [loading,] = useState(false);
     const login = (userData) => {
         try {
             setUser(userData);

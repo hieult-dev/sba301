@@ -11,6 +11,17 @@ export default function Header() {
         navigate("/login");
     }
 
+    const getEmailUser = () => {
+        const userData = localStorage.getItem('userdata');
+        if (!userData) return "";
+        try {
+            const user = JSON.parse(userData);
+            return user.email || "";
+        } catch {
+            return "";
+        }
+    }
+
     return (
         <>
             <header className="home-header">
@@ -20,7 +31,7 @@ export default function Header() {
 
                 <div className="home-userBox">
                     <div>
-                        Chào {"<Tên đăng nhập>"}{" "}
+                        Chào {getEmailUser()}{" "}
                         <Link to="/login" onClick={handleLogout} className="home-link">
                             đăng xuất
                         </Link>
