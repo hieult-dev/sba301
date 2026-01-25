@@ -8,6 +8,7 @@ import ProtectedRoute from './security/ProtectedRoute.jsx';
 import ManagePhamacy from './components/ManagePhamacy.jsx';
 import AddPhamacy from './components/AddPhamacy.jsx';
 import EditPhymacy from './components/EditPhamacy.jsx';
+import PhamacyDetail from './components/PhamacyDetail.jsx';
 export default function App() {
   return (
     <Routes>
@@ -23,8 +24,30 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="add-phamacy" element={<AddPhamacy />} />
-        <Route path="edit-phamacy" element={<EditPhymacy />} />
+        <Route
+          path="add-phamacy"
+          element={
+            <ProtectedRoute>
+              <AddPhamacy />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="edit-phamacy/:id"
+          element={
+            <ProtectedRoute>
+              <EditPhymacy />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="phamacy/:id"
+          element={
+            <ProtectedRoute>
+              <PhamacyDetail />
+            </ProtectedRoute>
+          }
+        />
       </Route>
     </Routes>
   );

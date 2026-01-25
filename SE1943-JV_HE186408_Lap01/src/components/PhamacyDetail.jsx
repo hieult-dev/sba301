@@ -1,10 +1,48 @@
-export default function PhamacyDetail({ phamacy, onBack }) {
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import phamacyApi from "../api/phamacyApi";
+
+export default function PhamacyDetail() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+
+    const [phamacy, setPhamacy] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        async function fetchDetail() {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await phamacyApi.getById(id);
+                setPhamacy(data);
+            } catch (e) {
+                setError(e?.message || "Load detail failed");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchDetail();
+    }, [id]);
+
+    if (loading) return <p style={{ padding: 16 }}>Loading detail...</p>;
+    if (error)
+        return (
+            <div style={{ padding: 16 }}>
+                <p style={{ color: "red" }}>{error}</p>
+                <button onClick={() => navigate(-1)}>Quay lại</button>
+            </div>
+        );
+
     return (
         <div className="home-contentBox" style={{ padding: 16 }}>
             <h3>Thông tin chi tiết</h3>
 
             <div style={{ marginTop: 16 }}>
                 <p><b>ID:</b> {phamacy.id}</p>
+                <p><b>Tên:</b> {phamacy.name}</p>
                 <p><b>Loại:</b> {phamacy.type}</p>
                 <p><b>Giá:</b> {phamacy.price}</p>
                 <p><b>Công Dụng:</b> {phamacy.cdung}</p>
@@ -12,7 +50,7 @@ export default function PhamacyDetail({ phamacy, onBack }) {
                 <p><b>Nhà Sản Xuất:</b> {phamacy.nsanxuat}</p>
             </div>
 
-            <button onClick={onBack} style={{ marginTop: 20 }}>
+            <button onClick={() => navigate(-1)} style={{ marginTop: 20 }}>
                 Quay lại
             </button>
         </div>

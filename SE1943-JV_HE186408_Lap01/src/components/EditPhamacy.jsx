@@ -1,208 +1,175 @@
-import { useEffect, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import phamacyApi from "../api/phamacyApi";
 
 export default function EditPhamacy() {
-    const navigate = useNavigate()
-    const location = useLocation()
-    const passed = location.state?.phamacy
+  const navigate = useNavigate();
+  const { id } = useParams();
 
-    const [form, setForm] = useState({
-        id: "",
-        code: "",
-        name: "",
-        type: "",
-        price: "",
-        cdung: "",
-        csudung: "",
-        nsanxuat: "",
-    })
+  const [form, setForm] = useState({
+    id: "",
+    code: "",
+    name: "",
+    type: "",
+    price: "",
+    cdung: "",
+    csudung: "",
+    nsanxuat: "",
+  });
 
-    useEffect(() => {
-        if (!passed) return
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchDetail() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await phamacyApi.getById(id);
+        if (cancelled) return;
 
         setForm({
-            id: passed.id ?? "",
-            code: passed.code ?? String(passed.id ?? ""),
-            name: passed.name ?? "",
-            type: passed.type ?? "",
-            price: passed.price ?? "",
-            cdung: passed.cdung ?? "",
-            csudung: passed.csudung ?? "",
-            nsanxuat: passed.nsanxuat ?? "",
-        })
-    }, [passed])
-
-    const onChange = () => {
-
+          id: data.id ?? "",
+          code: data.code ?? String(data.id ?? ""),
+          name: data.name ?? "",
+          type: data.type ?? "",
+          price: data.price ?? "",
+          cdung: data.cdung ?? "",
+          csudung: data.csudung ?? "",
+          nsanxuat: data.nsanxuat ?? "",
+        });
+      } catch (e) {
+        if (!cancelled) setError(e?.message || "Load detail failed");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
 
-    const onSave = () => {
-    }
+    if (id) fetchDetail();
 
-    if (!passed) {
-        return (
-            <div style={{ padding: 24 }}>
-                <b>Không có dữ liệu để sửa.</b>
-                <div style={{ marginTop: 12 }}>
-                    <button onClick={() => navigate(-1)}>Quay lại</button>
-                </div>
-            </div>
-        )
-    }
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const onSave = async (e) => {
+    e.preventDefault();
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      const payload = {
+        code: form.code,
+        name: form.name,
+        type: form.type,
+        price: form.price,
+        cdung: form.cdung,
+        csudung: form.csudung,
+        nsanxuat: form.nsanxuat,
+      };
+
+      await phamacyApi.update(id, payload);
+
+      alert("Cập nhật thành công!");
+      navigate("/manage-phamacy");
+    } catch (e) {
+      setError(e?.response?.data?.message || e?.message || "Update failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <p style={{ padding: 16 }}>Loading...</p>;
+
+  if (error && !saving) {
     return (
-        <div style={{ minHeight: "100vh", paddingTop: 24 }}>
+      <div style={{ padding: 16 }}>
+        <p style={{ color: "red" }}>{error}</p>
+        <button onClick={() => navigate(-1)}>Quay lại</button>
+      </div>
+    );
+  }
 
-            <form
-                onSubmit={onSave}
-                style={{
-                    width: 860,
-                    background: "#fff",
-                }}
-            >
-                <h3 style={{ marginBottom: 18, textAlign: "center", }}>Sửa Thông Tin Dược Phẩm</h3>
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Sửa Thông Tin Dược Phẩm</h3>
 
-                <div style={row}>
-                    <label style={label}>Mã:</label>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <input
-                            name="code"
-                            value={form.code}
-                            readOnly
-                            style={{ ...input, width: 280, background: "#f2f2f2" }}
-                        />
-                    </div>
-                </div>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {saving && <p>Saving...</p>}
 
-                <div style={row}>
-                    <label style={label}>Tên:</label>
-                    <input
-                        name="name"
-                        value={form.name}
-                        onChange={onChange}
-                        style={{ ...input, width: 520 }}
-                        placeholder="<Tên Dược Phẩm>"
-                        required
-                    />
-                </div>
+      <form onSubmit={onSave}>
+        <p>
+          <b>Mã:</b><br />
+          <input name="code" value={form.code} readOnly />
+        </p>
 
-                <div style={row}>
-                    <label style={label}>Loại:</label>
-                    <select
-                        name="type"
-                        value={form.type}
-                        onChange={onChange}
-                        style={{ ...input, width: 520 }}
-                        required
-                    >
-                        <option value="">Danh sách (chọn)</option>
-                        <option value="TPCN">Thực Phẩm Chức Năng</option>
-                        <option value="THUOC_KE_DON">Thuốc Kê Theo Đơn</option>
-                        <option value="THUOC_KHONG_KE_DON">Thuốc Không Kê Đơn</option>
-                    </select>
-                </div>
+        <p>
+          <b>Tên:</b><br />
+          <input
+            name="name"
+            value={form.name}
+            onChange={onChange}
+            required
+          />
+        </p>
 
-                <div style={row}>
-                    <label style={label}>Giá (đ):</label>
-                    <input
-                        name="price"
-                        value={form.price}
-                        onChange={onChange}
-                        style={{ ...input, width: 260 }}
-                        inputMode="numeric"
-                    />
-                </div>
+        <p>
+          <b>Loại:</b><br />
+          <select name="type" value={form.type} onChange={onChange} required>
+            <option value="">-- Chọn --</option>
+            <option value="TPCN">Thực Phẩm Chức Năng</option>
+            <option value="THUOC_KE_DON">Thuốc Kê Theo Đơn</option>
+            <option value="THUOC_KHONG_KE_DON">Thuốc Không Kê Đơn</option>
+          </select>
+        </p>
 
-                <div style={rowTop}>
-                    <label style={labelTop}>Công dụng:</label>
-                    <textarea
-                        name="cdung"
-                        value={form.cdung}
-                        onChange={onChange}
-                        style={textarea}
-                    />
-                </div>
+        <p>
+          <b>Giá:</b><br />
+          <input
+            name="price"
+            value={form.price}
+            onChange={onChange}
+            inputMode="numeric"
+          />
+        </p>
 
-                <div style={rowTop}>
-                    <label style={labelTop}>Hướng dẫn sử dụng:</label>
-                    <textarea
-                        name="csudung"
-                        value={form.csudung}
-                        onChange={onChange}
-                        style={textarea}
-                    />
-                </div>
+        <p>
+          <b>Công dụng:</b><br />
+          <textarea name="cdung" value={form.cdung} onChange={onChange} />
+        </p>
 
-                <div style={row}>
-                    <label style={label}>Nhà Sản Xuất:</label>
-                    <input
-                        name="nsanxuat"
-                        value={form.nsanxuat}
-                        onChange={onChange}
-                        style={{ ...input, width: 520 }}
-                    />
-                </div>
+        <p>
+          <b>Hướng dẫn sử dụng:</b><br />
+          <textarea name="csudung" value={form.csudung} onChange={onChange} />
+        </p>
 
-                <div style={{ display: "flex", justifyContent: "center", gap: 26, marginTop: 26 }}>
-                    <button type="submit" style={btnPrimary}>Save</button>
-                    <button type="button" style={btnSecondary} onClick={() => navigate(-1)}>
-                        Quay Lại
-                    </button>
-                </div>
-            </form>
-        </div>
-    )
-}
+        <p>
+          <b>Nhà sản xuất:</b><br />
+          <input
+            name="nsanxuat"
+            value={form.nsanxuat}
+            onChange={onChange}
+          />
+        </p>
 
-const row = {
-    display: "grid",
-    gridTemplateColumns: "170px 1fr",
-    gap: 12,
-    marginBottom: 14,
-    alignItems: "center",
-}
-
-const rowTop = {
-    display: "grid",
-    gridTemplateColumns: "170px 1fr",
-    gap: 12,
-    marginBottom: 14,
-    alignItems: "start",
-}
-
-const label = { textAlign: "right" }
-const labelTop = { textAlign: "right", paddingTop: 6 }
-
-const input = {
-    height: 34,
-    border: "1.5px solid #000",
-    padding: "0 10px",
-    outline: "none",
-}
-
-const textarea = {
-    minHeight: 70,
-    border: "1.5px solid #000",
-    padding: 10,
-    outline: "none",
-    resize: "vertical",
-    width: 520,
-}
-
-const btnPrimary = {
-    minWidth: 160,
-    height: 40,
-    border: "2px solid #2b6cb0",
-    background: "#e6f0ff",
-    fontWeight: 600,
-    cursor: "pointer",
-}
-
-const btnSecondary = {
-    minWidth: 160,
-    height: 40,
-    border: "2px solid #2b6cb0",
-    background: "#f2f2f2",
-    fontWeight: 600,
-    cursor: "pointer",
+        <button type="submit" disabled={saving}>
+          Lưu
+        </button>
+        &nbsp;
+        <button type="button" onClick={() => navigate(-1)} disabled={saving}>
+          Quay lại
+        </button>
+      </form>
+    </div>
+  );
 }

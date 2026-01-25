@@ -1,147 +1,88 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PhamacyDetail from "./PhamacyDetail";
-import { useNavigate } from "react-router-dom"
-
+import { useNavigate } from "react-router-dom";
+import phamacyApi from "../api/phamacyApi";
 
 export default function ManagePhamacy() {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-    const phamacy = [
-        {
-            id: 1,
-            name: "Paracetamol 500mg",
-            type: "Thuốc không kê đơn",
-            phone: "0901000001",
-            price: "25.000",
-            cdung: "Giảm đau, hạ sốt",
-            csudung: "Uống sau ăn",
-            nsanxuat: "Công ty Dược ABC"
-        },
-        {
-            id: 2,
-            name: "Ibuprofen 400mg",
-            type: "Thuốc không kê đơn",
-            phone: "0901000002",
-            price: "35.000",
-            cdung: "Giảm đau, chống viêm",
-            csudung: "Uống sau ăn",
-            nsanxuat: "Công ty Dược DEF"
-        },
-        {
-            id: 3,
-            name: "Vitamin C 500mg",
-            type: "Thực phẩm chức năng",
-            phone: "0901000003",
-            price: "45.000",
-            cdung: "Tăng sức đề kháng",
-            csudung: "Uống buổi sáng",
-            nsanxuat: "Công ty Dược XYZ"
-        },
-        {
-            id: 4,
-            name: "Amoxicillin 500mg",
-            type: "Thuốc kê đơn",
-            phone: "0901000004",
-            price: "60.000",
-            cdung: "Điều trị nhiễm khuẩn",
-            csudung: "Uống theo chỉ định bác sĩ",
-            nsanxuat: "Công ty Dược ABC"
-        },
-        {
-            id: 5,
-            name: "Panadol Extra",
-            type: "Thuốc không kê đơn",
-            phone: "0901000005",
-            price: "30.000",
-            cdung: "Giảm đau đầu, đau răng",
-            csudung: "Uống khi đau",
-            nsanxuat: "Công ty Dược GSK"
-        },
-        {
-            id: 6,
-            name: "Bổ Gan Boganic",
-            type: "Thực phẩm chức năng",
-            phone: "0901000006",
-            price: "95.000",
-            cdung: "Hỗ trợ chức năng gan",
-            csudung: "Uống 2 lần/ngày",
-            nsanxuat: "Công ty Dược Traphaco"
-        },
-        {
-            id: 7,
-            name: "Efferalgan 500mg",
-            type: "Thuốc không kê đơn",
-            phone: "0901000007",
-            price: "40.000",
-            cdung: "Hạ sốt, giảm đau",
-            csudung: "Hòa tan với nước",
-            nsanxuat: "Công ty UPSA"
-        },
-        {
-            id: 8,
-            name: "Smecta",
-            type: "Thuốc không kê đơn",
-            phone: "0901000008",
-            price: "50.000",
-            cdung: "Điều trị tiêu chảy",
-            csudung: "Pha với nước uống",
-            nsanxuat: "Công ty Ipsen"
-        },
-        {
-            id: 9,
-            name: "Alpha Choay",
-            type: "Thuốc kê đơn",
-            phone: "0901000009",
-            price: "110.000",
-            cdung: "Giảm phù nề, kháng viêm",
-            csudung: "Uống trước ăn",
-            nsanxuat: "Công ty Sanofi"
-        },
-        {
-            id: 10,
-            name: "Oresol",
-            type: "Thuốc không kê đơn",
-            phone: "0901000010",
-            price: "15.000",
-            cdung: "Bù nước và điện giải",
-            csudung: "Pha đúng liều lượng",
-            nsanxuat: "Công ty Dược OPC"
-        },
-        {
-            id: 11,
-            name: "Hoạt Huyết Dưỡng Não",
-            type: "Thực phẩm chức năng",
-            phone: "0901000011",
-            price: "120.000",
-            cdung: "Tăng cường tuần hoàn não",
-            csudung: "Uống 2 lần/ngày",
-            nsanxuat: "Công ty Dược Traphaco"
-        },
-        {
-            id: 12,
-            name: "Clorpheniramin",
-            type: "Thuốc không kê đơn",
-            phone: "0901000012",
-            price: "20.000",
-            cdung: "Giảm dị ứng, sổ mũi",
-            csudung: "Uống buổi tối",
-            nsanxuat: "Công ty Dược Hà Tây"
-        }
-    ];
+    const [phamacy, setPhamacy] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const toAddpage = () => {
-        navigate("/add-phamacy")
-
-    }
     const [selectedPhamacy, setselectedPhamacy] = useState(null);
+
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 5;
-    const totalPages = Math.max(1, Math.ceil(phamacy.length / pageSize));
+
+    const [searchInput, setSearchInput] = useState("");
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [deletingId, setDeletingId] = useState(null);
+
+    const toAddpage = () => {
+        navigate("/add-phamacy");
+    };
+
+    // list phamacy
+    useEffect(() => {
+        let cancelled = false;
+
+        async function fetchPhamacy() {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await phamacyApi.getAll();
+                console.log("Fetched phamacy:", data);
+
+                if (!cancelled) setPhamacy(Array.isArray(data) ? data : []);
+            } catch (e) {
+                if (!cancelled) setError(e?.message || "Fetch failed");
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        }
+
+        fetchPhamacy();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    // filter phamacy by name
+    const filteredPhamacy = phamacy.filter((item) => {
+        if (!searchKeyword) return true;
+        return item.name?.toLowerCase().includes(searchKeyword.toLowerCase());
+    });
+
+    // delete phamacy
+    const handleDelete = async (id) => {
+        const ok = window.confirm("Bạn chắc chắn muốn xóa dược phẩm này?");
+        if (!ok) return;
+
+        try {
+            setDeletingId(id);
+            await phamacyApi.remove(id);
+
+            setPhamacy((prev) => prev.filter((x) => String(x.id) !== String(id)));
+
+            const remaining = filteredPhamacy.length - 1;
+            const newTotalPages = Math.max(1, Math.ceil(remaining / pageSize));
+            setCurrentPage((p) => Math.min(p, newTotalPages));
+        } catch (e) {
+            alert(e?.message || "Xóa thất bại");
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+
+    const totalPages = Math.max(1, Math.ceil(filteredPhamacy.length / pageSize));
     const safePage = Math.min(currentPage, totalPages);
     const startIndex = (safePage - 1) * pageSize;
-    const endIndex = Math.min(startIndex + pageSize, phamacy.length);
-    const pagedPhamacy = phamacy.slice(startIndex, endIndex);
-    const displayStart = phamacy.length === 0 ? 0 : startIndex + 1;
+    const endIndex = Math.min(startIndex + pageSize, filteredPhamacy.length);
+    const pagedPhamacy = filteredPhamacy.slice(startIndex, endIndex);
+    const displayStart = filteredPhamacy.length === 0 ? 0 : startIndex + 1;
+
     if (selectedPhamacy) {
         return (
             <PhamacyDetail
@@ -158,10 +99,7 @@ export default function ManagePhamacy() {
             <div style={{ padding: "0 16px 16px" }}>
                 <div style={{ marginBottom: 12 }}>
                     Loại:&nbsp;
-                    <select
-                        name="type"
-                        style={{ padding: "4px 8px", minWidth: 200 }}
-                    >
+                    <select name="type" style={{ padding: "4px 8px", minWidth: 200 }}>
                         <option value="">Chọn loại</option>
                         <option value="TPCN">Thực Phẩm Chức Năng</option>
                         <option value="THUOC_KE_DON">Thuốc Kê Theo Đơn</option>
@@ -170,9 +108,21 @@ export default function ManagePhamacy() {
                 </div>
 
                 <div style={{ marginBottom: 16 }}>
-                    Tên: <input style={{ width: 300 }} />
+                    Tên:{" "}
+                    <input
+                        style={{ width: 300 }}
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                    />
                     &nbsp;&nbsp;&nbsp;
-                    <button>Tìm</button>
+                    <button
+                        onClick={() => {
+                            setSearchKeyword(searchInput.trim());
+                            setCurrentPage(1);
+                        }}
+                    >
+                        Tìm
+                    </button>
                     <button onClick={toAddpage}>Thêm Mới Dược Phẩm</button>
                 </div>
 
@@ -202,9 +152,7 @@ export default function ManagePhamacy() {
                             Trước
                         </button>
                         <button
-                            onClick={() =>
-                                setCurrentPage((p) => Math.min(totalPages, p + 1))
-                            }
+                            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                             disabled={safePage === totalPages}
                         >
                             Sau
@@ -212,53 +160,79 @@ export default function ManagePhamacy() {
                     </div>
                 </div>
 
-                <table border="1" width="100%" cellPadding="6">
-                    <thead>
-                        <tr style={{ background: "#8faadc" }}>
-                            <th>STT</th>
-                            <th>Mã</th>
-                            <th>Tên</th>
-                            <th>Loại</th>
-                            <th>Công dụng</th>
-                            <th>Nhà SX</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
+                {loading && <p style={{ padding: "8px 0" }}>Loading...</p>}
+                {error && <p style={{ padding: "8px 0", color: "red" }}>{error}</p>}
 
-                    <tbody>
-                        {pagedPhamacy.map((phamacy, index) => (
-                            <tr key={phamacy.id}>
-                                <td>{index + 1}</td>
-                                <td>{phamacy.id}</td>
-                                <td>{phamacy.name}</td>
-                                <td>{phamacy.type}</td>
-                                <td>{phamacy.cdung}</td>
-                                <td>{phamacy.nsanxuat}</td>
-                                <td></td>
-                                <td>
-                                    <button onClick={() => setselectedPhamacy(phamacy)}>
-                                        Xem Chi Tiết
-                                    </button>
-                                    <button onClick={() => navigate("/edit-phamacy", { state: { phamacy } })}>
-                                        Sửa
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                {!loading && !error && (
+                    <>
+                        <table border="1" width="100%" cellPadding="6">
+                            <thead>
+                                <tr style={{ background: "#8faadc" }}>
+                                    <th>STT</th>
+                                    <th>Mã</th>
+                                    <th>Tên</th>
+                                    <th>Loại</th>
+                                    <th>Công dụng</th>
+                                    <th>Nhà SX</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
 
-                <div
-                    style={{
-                        textAlign: "center",
-                        marginTop: 12,
-                        fontSize: 13,
-                        color: "#555",
-                    }}
-                >
-                    Hiển thị từ {displayStart} đến {endIndex} trên {phamacy.length} dược phẩm
-                </div>
+                            <tbody>
+                                {pagedPhamacy.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td>{startIndex + index + 1}</td>
+                                        <td>{item.id}</td>
+                                        <td>{item.name}</td>
+                                        <td>{item.type}</td>
+                                        <td>{item.cdung}</td>
+                                        <td>{item.nsanxuat}</td>
+                                        <td></td>
+                                        <td>
+                                            <button onClick={() => navigate(`/phamacy/${item.id}`)}>
+                                                Xem Chi Tiết
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    navigate(`/edit-phamacy/${item.id}`)}
+                                            >
+                                                Sửa
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(item.id)}
+                                                disabled={deletingId === item.id}
+                                            >
+                                                {deletingId === item.id ? "Đang xóa..." : "Xóa"}
+                                            </button>
+
+                                        </td>
+                                    </tr>
+                                ))}
+
+                                {pagedPhamacy.length === 0 && (
+                                    <tr>
+                                        <td colSpan={8} style={{ textAlign: "center" }}>
+                                            Không có dữ liệu
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+
+                        <div
+                            style={{
+                                textAlign: "center",
+                                marginTop: 12,
+                                fontSize: 13,
+                                color: "#555",
+                            }}
+                        >
+                            Hiển thị từ {displayStart} đến {endIndex} trên{" "}
+                            {filteredPhamacy.length} dược phẩm
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

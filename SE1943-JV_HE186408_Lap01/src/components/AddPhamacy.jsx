@@ -1,167 +1,117 @@
-import { useState } from "react"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import phamacyApi from "../api/phamacyApi";
 
-export default function AddPhymacy({ onBack }) {
-    const [form,] = useState({
-        code: "",
-        name: "",
-        type: "",
-        price: "",
-        usage: "",
-        guide: "",
-        manufacturer: "",
-    })
+export default function AddPhymacy() {
+  const navigate = useNavigate();
 
-    const onChange = () => {
+  const [form, setForm] = useState({
+    code: "",
+    name: "",
+    type: "",
+    price: "",
+    usage: "",
+    guide: "",
+    manufacturer: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const onSave = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const payload = {
+        code: form.code,
+        name: form.name,
+        type: form.type,
+        price: form.price,
+        cdung: form.usage,
+        csudung: form.guide,
+        nsanxuat: form.manufacturer,
+      };
+
+      const created = await phamacyApi.create(payload);
+      console.log("Created:", created);
+
+      alert("Tạo dược phẩm thành công!");
+      navigate("/manage-phamacy");
+    } catch (e) {
+      setError(e?.response?.data?.message || e?.message || "Create failed");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const onSave = () => {
-    }
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Thêm Mới Dược Phẩm</h3>
 
-    return (
-        <div style={{ minHeight: "100vh", paddingTop: 40 }}>
-            <form
-                onSubmit={onSave}
-                style={{
-                    width: 760,
-                    background: "#fff",
-                }}
-            >
-                <h3 style={{ textAlign: "center", marginBottom: 24 }}>
-                    Thêm Mới Dược Phẩm
-                </h3>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && <p>Saving...</p>}
 
-                <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 12, marginBottom: 14, alignItems: "center" }}>
-                    <div style={{ textAlign: "right" }}>Mã:</div>
-                    <input
-                        name="code"
-                        value={form.code}
-                        onChange={onChange}
-                        style={inputStyle}
-                        placeholder=""
-                    />
-                </div>
+      <form onSubmit={onSave}>
+        <p>
+          <b>Mã:</b><br />
+          <input name="code" value={form.code} onChange={onChange} />
+        </p>
 
-                <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 12, marginBottom: 14, alignItems: "center" }}>
-                    <div style={{ textAlign: "right" }}>Tên:</div>
-                    <input
-                        name="name"
-                        value={form.name}
-                        onChange={onChange}
-                        style={inputStyle}
-                        placeholder="<Tên Dược Phẩm>"
-                        required
-                    />
-                </div>
+        <p>
+          <b>Tên:</b><br />
+          <input name="name" value={form.name} onChange={onChange} required />
+        </p>
 
-                <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 12, marginBottom: 14, alignItems: "center" }}>
-                    <div style={{ textAlign: "right" }}>Loại:</div>
-                    <select
-                        name="type"
-                        value={form.type}
-                        onChange={onChange}
-                        style={inputStyle}
-                        required
-                    >
-                        <option value="">Danh sách (chọn)</option>
-                        <option value="TPCN">Thực Phẩm Chức Năng</option>
-                        <option value="THUOC_KE_DON">Thuốc Kê Theo Đơn</option>
-                        <option value="THUOC_KHONG_KE_DON">Thuốc Không Kê Đơn</option>
-                    </select>
-                </div>
+        <p>
+          <b>Loại:</b><br />
+          <select name="type" value={form.type} onChange={onChange} required>
+            <option value="">-- Chọn --</option>
+            <option value="TPCN">Thực Phẩm Chức Năng</option>
+            <option value="THUOC_KE_DON">Thuốc Kê Theo Đơn</option>
+            <option value="THUOC_KHONG_KE_DON">Thuốc Không Kê Đơn</option>
+          </select>
+        </p>
 
-                <div style={{ display: "grid", gridTemplateColumns: "140px 160px 1fr", gap: 12, marginBottom: 14, alignItems: "center" }}>
-                    <div style={{ textAlign: "right" }}>Giá (đ):</div>
-                    <input
-                        name="price"
-                        value={form.price}
-                        onChange={onChange}
-                        style={{ ...inputStyle, width: 160 }}
-                        placeholder=""
-                        inputMode="numeric"
-                    />
-                    <div />
-                </div>
+        <p>
+          <b>Giá:</b><br />
+          <input name="price" value={form.price} onChange={onChange} />
+        </p>
 
-                <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 12, marginBottom: 14, alignItems: "start" }}>
-                    <div style={{ textAlign: "right", paddingTop: 6 }}>Công dụng:</div>
-                    <textarea
-                        name="usage"
-                        value={form.usage}
-                        onChange={onChange}
-                        style={textareaStyle}
-                    />
-                </div>
+        <p>
+          <b>Công dụng:</b><br />
+          <textarea name="usage" value={form.usage} onChange={onChange} />
+        </p>
 
-                <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 12, marginBottom: 14, alignItems: "start" }}>
-                    <div style={{ textAlign: "right", paddingTop: 6 }}>Hướng dẫn sử dụng:</div>
-                    <textarea
-                        name="guide"
-                        value={form.guide}
-                        onChange={onChange}
-                        style={textareaStyle}
-                    />
-                </div>
+        <p>
+          <b>Hướng dẫn sử dụng:</b><br />
+          <textarea name="guide" value={form.guide} onChange={onChange} />
+        </p>
 
-                <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 12, marginBottom: 26, alignItems: "center" }}>
-                    <div style={{ textAlign: "right" }}>Nhà Sản Xuất:</div>
-                    <input
-                        name="manufacturer"
-                        value={form.manufacturer}
-                        onChange={onChange}
-                        style={inputStyle}
-                    />
-                </div>
+        <p>
+          <b>Nhà sản xuất:</b><br />
+          <input
+            name="manufacturer"
+            value={form.manufacturer}
+            onChange={onChange}
+          />
+        </p>
 
-                <div style={{ display: "flex", justifyContent: "center", gap: 26 }}>
-                    <button type="submit" style={btnPrimary}>
-                        Save
-                    </button>
-
-                    <button
-                        type="button"
-                        style={btnSecondary}
-                        onClick={() => {
-                            if (onBack) onBack()
-                            else window.history.back()
-                        }}
-                    >
-                        Quay Lại
-                    </button>
-                </div>
-            </form>
-        </div>
-    )
-}
-
-const inputStyle = {
-    height: 36,
-    border: "1.5px solid #000",
-    padding: "0 10px",
-    outline: "none",
-}
-
-const textareaStyle = {
-    minHeight: 70,
-    border: "1.5px solid #000",
-    padding: 10,
-    outline: "none",
-    resize: "vertical",
-}
-
-const btnPrimary = {
-    minWidth: 200,
-    height: 40,
-    border: "2px solid #2b6cb0",
-    background: "#e6f0ff",
-    fontWeight: 600,
-    cursor: "pointer",
-}
-
-const btnSecondary = {
-    minWidth: 200,
-    height: 40,
-    border: "2px solid #2b6cb0",
-    background: "#f2f2f2",
-    fontWeight: 600,
-    cursor: "pointer",
+        <button type="submit" disabled={loading}>
+          Lưu
+        </button>
+        &nbsp;
+        <button type="button" onClick={() => navigate(-1)} disabled={loading}>
+          Quay lại
+        </button>
+      </form>
+    </div>
+  );
 }
